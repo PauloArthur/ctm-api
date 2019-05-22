@@ -3,6 +3,7 @@
 use App\City;
 use Seeds\Classes\Skyscanner;
 use Seeds\Classes\LivingCost;
+use Seeds\Classes\HousingCost;
 use GuzzleHttp\Client;
 use Illuminate\Database\Seeder;
 
@@ -38,6 +39,8 @@ class CityTableSeeder extends Seeder
 
         $living_cost = new LivingCost();
 
+        $housing_cost = new HousingCost();
+
         $meals = [
             "Meal, Inexpensive Restaurant" => 1,
             "Meal for 2 People, Mid-range Restaurant, Three-course" => 1,
@@ -47,6 +50,7 @@ class CityTableSeeder extends Seeder
         $cities_places = [];
 
         $cities = $this->getIATACities();
+
         $this->command->info('IATA Cities loaded!');
 
         $cities_length = count($cities);
@@ -60,10 +64,15 @@ class CityTableSeeder extends Seeder
             if ( !$place ) continue;
 
             $meals_avg = $living_cost->getCityMeal($city->name, $meals);
+            $place["meal_cost"] = $meals_avg;
 
             if ( !$meals_avg ) continue;
+
+            $housing_avg = $housing_cost->getCityHousing($city->name);
+            $place["housing_cost"] = $housing_avg;
+
+            if ( !$housing_avg ) continue;
         
-            $place["meals_cost"] = $meals_avg;
             $cities_places[] = $place;
             $count_save++;
             $this->command->info('City ' . $count_save . ' saved, of '. $count .' of '. $cities_length. '...');

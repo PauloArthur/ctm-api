@@ -17,7 +17,7 @@ class CreateCitiesTable extends Migration
             $table->bigIncrements('id');
             $table->string('name');
             $table->string('city_id');
-            $table->double('meals_cost', 15, 8);
+            $table->double('meal_cost', 15, 8);
             $table->double('housing_cost', 15, 8);
             $table->timestamps();
         });
