@@ -38,8 +38,9 @@ class LivingCost {
         $count_costs = count($filtered_costs);
 
         $sum_costs = array_reduce ( $filtered_costs, function ($sum, $cost) use ($meals) {
+            $price = is_numeric((float)$cost->cost) ? (float)$cost->cost : 0;
             $weight = $meals[$cost->item];
-            return $sum + ($cost->cost * $weight);
+            return $sum + ($price * $weight);
         }, 0 ); 
 
         return $count_costs ? $sum_costs/$count_costs : false;
