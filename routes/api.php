@@ -16,3 +16,10 @@ use Illuminate\Http\Request;
 Route::middleware('auth:api')->get('/user', function (Request $request) {
     return $request->user();
 });
+
+ 
+Route::get('cities', 'CityController@index');
+Route::get('cities/{city}', 'CityController@show');
+Route::get('cities/autocomplete/{search}', 'CityController@autocomplete');
+
+Route::post('cities/cheapest', 'CityController@cheapest');
