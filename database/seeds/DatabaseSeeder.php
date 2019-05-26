@@ -4,6 +4,8 @@ use App\City;
 use Seeds\Classes\Skyscanner;
 use Seeds\Classes\LivingCost;
 use Seeds\Classes\HousingCost;
+
+use Carbon\Carbon;
 use GuzzleHttp\Client;
 use Illuminate\Database\Seeder;
 
@@ -16,8 +18,6 @@ class DatabaseSeeder extends Seeder
      */
     public function run()
     {
-        // $this->call(UsersTableSeeder::class);
-
         $this->call('CityTableSeeder');
 
         $this->command->info('City table seeded!');
@@ -43,7 +43,6 @@ class CityTableSeeder extends Seeder
 
         $meals = [
             "Meal, Inexpensive Restaurant" => 1,
-            "Meal for 2 People, Mid-range Restaurant, Three-course" => 1,
             "Water (12 oz small bottle)" => 2
         ];
 
@@ -57,7 +56,16 @@ class CityTableSeeder extends Seeder
         $count = 0;
         $count_save = 0;
 
+        $interval_time = new Carbon();
+
+        $this->command->line("Initial Time: ". $interval_time);
         foreach ($cities as $city) {
+            $now = new Carbon();
+            if ( $now->isAfter($interval_time->copy()->addMinutes(15)) ){
+                $interval_time = $now;
+                $this->command->line("Time: ". $interval_time);
+            }
+
             $place = $skyscanner->getCityPlace($city->country_code, $city->name);
             $count++;
 
@@ -67,23 +75,21 @@ class CityTableSeeder extends Seeder
             $place["meal_cost"] = $meals_avg;
 
             if ( !$meals_avg ) continue;
-
-            $housing_avg = $housing_cost->getCityHousing($city->name);
-            $place["housing_cost"] = $housing_avg;
-
-            if ( !$housing_avg ) continue;
-        
+            /*$housing_avg = $housing_cost->getCityHousing($city->name);
+            if ( !$housing_avg ) continue; */
+            
+            $place["housing_cost"] = float_rand(25.0, 150.0, 2);
+            
             $cities_places[] = $place;
+            City::create($place);
             $count_save++;
-            $this->command->info('City ' . $count_save . ' saved, of '. $count .' of '. $cities_length. '...');
+            
+            $this->command->info('City '.$count_save.' saved, '.$count.' of '.$cities_length.'...');
         }
+        $this->command->line("Finish Time: ". $interval_time);
         
         dd($cities_places);
 
-        City::create([
-            'name' => 'Fortaleza',
-            'city_id' => 'FOR-sky',
-        ]);
     }
 
     private function getIATACities()
@@ -94,4 +100,26 @@ class CityTableSeeder extends Seeder
 
         return json_decode( $res->getBody()->getContents() )->response;
     }
+}
+
+
+/**
+ * Generate Float Random Number
+ *
+ * @param float $Min Minimal value
+ * @param float $Max Maximal value
+ * @param int $round The optional number of decimal digits to round to. default 0 means not round
+ * @return float Random float value
+ */
+function float_rand($Min, $Max, $round=0){
+    //validate input
+    if ($Min > $Max) { $min=$Max; $max=$Min; }
+    else { $min=$Min; $max=$Max; }
+
+    $randomfloat = $min + mt_rand() / mt_getrandmax() * ($max - $min);
+
+    if($round > 0)
+        $randomfloat = round($randomfloat, $round);
+
+    return $randomfloat;
 }

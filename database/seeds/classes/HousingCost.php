@@ -81,7 +81,7 @@ class HousingCost {
         return ( $current < $aux_time );
     }
 
-    private function getHousingCost(String $city)
+    private function getHotels(String $city)
     {   
         $city = str_replace(" ", "-", strtolower( $city ));
 
@@ -94,7 +94,11 @@ class HousingCost {
 
     public function getCityHousing(String $city)
     {
-        $costs = $this->getHousingCost($city);
+        $hotels = $this->getHotels($city);
+
+        $costs = array_map(function ($hotel) {
+            return $hotel;
+        }, $hotels);
 
         dd($costs);
 
