@@ -1,6 +1,8 @@
 <?php
 namespace Seeds\Classes;
 use GuzzleHttp\Client;
+use GuzzleHttp\Exception\RequestException;
+use Psr\Http\Message\ResponseInterface;
 
 class Skyscanner {
     public $client;
@@ -20,9 +22,18 @@ class Skyscanner {
     {   
         $city = str_replace(" ", "+", ucwords( $city ));
 
-        $res = $this->client->get( $country.'/USD/en-US/?query='.$city );
+        // $res = $this->client->get( $country.'/USD/en-US/?query='.$city );
 
-        return json_decode( $res->getBody()->getContents() )->Places;
+        $promise = $this->client->requestAsync( 'GET', $country.'/USD/en-US/?query='.$city );
+        return $promise->then(
+            function (ResponseInterface $res) {
+                return json_decode( $res->getBody()->getContents() )->Places;
+            },
+            function (RequestException $e) {
+                return false;
+            }
+        )->wait();
+
     }
 
     public function getCityPlace(String $country, String $city)
@@ -38,7 +49,7 @@ class Skyscanner {
         $place = reset( $filtered_places );
 
         return $place ? [
-            "city" => $city,
+            "city_name" => $city,
             "city_id" => $place->CityId,
             "country_code" => $country        
         ] : false;
