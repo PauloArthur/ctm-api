@@ -20,6 +20,6 @@ Route::middleware('auth:api')->get('/user', function (Request $request) {
  
 Route::get('cities', 'CityController@index');
 Route::get('cities/{city}', 'CityController@show');
-Route::get('cities/autocomplete/{search}', 'CityController@autocomplete');
+Route::get('cities/autocomplete/{search}', ['middleware' => 'cors', 'uses' => 'CityController@autocomplete']);
 
 Route::post('cities/cheapest', 'CityController@cheapest');
