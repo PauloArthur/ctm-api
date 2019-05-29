@@ -19,6 +19,8 @@ class CityController extends Controller
 
     public function autocomplete($search)
     {
+        $search = str_replace("+", "-", $search );
+
         $query = City::where('city_name', 'like', $search.'%')->select('id', 'city_name', 'country_code');
         
         return $query->orderBy('city_name', 'asc')->limit(15)->get();

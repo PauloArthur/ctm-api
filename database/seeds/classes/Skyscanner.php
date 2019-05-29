@@ -20,7 +20,7 @@ class Skyscanner {
 
     private function getSkyscannerPlaces(String $country, String $city)
     {   
-        $city = str_replace(" ", "+", ucwords( $city ));
+        $city = str_replace(" ", "+", $city );
 
         $promise = $this->client->requestAsync( 'GET', $country.'/USD/en-US/?query='.$city );
         
@@ -37,12 +37,14 @@ class Skyscanner {
 
     public function getCityPlace(String $country, String $city)
     {
-        $places = $this->getSkyscannerPlaces($country, $city);
+        $format_city = ucwords( $city );
+
+        $places = $this->getSkyscannerPlaces($country, $format_city);
 
         if (!$places) return false;
         
-        $filtered_places = array_filter($places, function ($place) use ($city) {
-            return $place->PlaceName === $city;
+        $filtered_places = array_filter($places, function ($place) use ($format_city) {
+            return $place->PlaceName === $format_city;
         });
 
         $place = reset( $filtered_places );

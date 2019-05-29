@@ -61,7 +61,7 @@ class CityTableSeeder extends Seeder
         $this->command->line("Initial Time: ". $interval_time);
         foreach ($cities as $city) {
             $now = new Carbon();
-            if ( $now->isAfter($interval_time->copy()->addMinutes(15)) ){
+            if ( $now->isAfter($interval_time->copy()->addHours(1)) ){
                 $interval_time = $now;
                 $this->command->line("Time: ". $interval_time);
             }
