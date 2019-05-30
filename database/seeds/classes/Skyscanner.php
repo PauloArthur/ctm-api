@@ -22,7 +22,7 @@ class Skyscanner {
     {   
         $city = str_replace(" ", "+", $city );
 
-        $promise = $this->client->requestAsync( 'GET', $country.'/USD/en-US/?query='.$city );
+        $promise = $this->client->requestAsync( 'GET', "$country/USD/en-US/?query=$city" );
         
         return $promise->then(
             function (ResponseInterface $res) {
