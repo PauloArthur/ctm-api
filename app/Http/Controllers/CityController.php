@@ -54,6 +54,10 @@ class CityController extends Controller
         });
         
         $url_date = "$data->outboundDate?inboundpartialdate=$data->inboundDate";
+        $outbound_date = Carbon::createMidnightDate($data->outboundDate);
+        $inbound_date = Carbon::createMidnightDate($data->inboundDate);
+
+        $travel_duration_in_days = $outbound_date->diffInDays($inbound_date);
 
         $client = $this->getSkyscannerClient();
 
@@ -71,8 +75,8 @@ class CityController extends Controller
             $housing_employees = $sum_employees - $destination->employees;
             $housing_daily_cost = $destination_city->housing_cost * $housing_employees;
 
-            $meals_total_cost = $meals_daily_cost * 15; /* $days FALTA CALCULAR OS DIAS */
-            $housing_total_cost = $housing_daily_cost * 15; /* $days FALTA CALCULAR OS DIAS */
+            $meals_total_cost = $meals_daily_cost * $travel_duration_in_days;
+            $housing_total_cost = $housing_daily_cost * $travel_duration_in_days;
 
             $travel_total_cost = 0;
             $has_no_quote = false;
@@ -97,8 +101,8 @@ class CityController extends Controller
             $sum_total_cost = $meals_total_cost + $housing_total_cost + $travel_total_cost;
             
             if ( $sum_total_cost < $cheapest_meeting['sum_total_cost'] ) {
-                $separate_costs = compact("meals_total_cost", "housing_total_cost", "travel_total_cost");
-                $cheapest_meeting = compact("sum_total_cost", "destination_city", "separate_costs");
+                $separate_info = compact("meals_total_cost", "housing_total_cost", "travel_total_cost", "travel_duration_in_days");
+                $cheapest_meeting = compact("sum_total_cost", "destination_city", "separate_info");
             }
         }
 
