@@ -9,6 +9,7 @@ use Psr\Http\Message\ResponseInterface;
 class FlightsController extends Controller
 {
     private $client;
+    private $requests_count;
 
     function __construct() {        
         $this->client = new Client([
@@ -18,11 +19,23 @@ class FlightsController extends Controller
                 'X-RapidAPI-Host' => 'skyscanner-skyscanner-flight-search-v1.p.rapidapi.com',
             ]
         ]);
+        $this->requests_count = 0;
     }
 
-    private function getSkycannerClient()
+    private function setRequestsCountZero()
     { 
-        return $this->client;
+        $this->requests_count = 0;
+    }
+
+    private function requestCount()
+    { 
+        $this->requests_count = $this->requests_count + 1;
+        $has_timeout = $this->requests_count === 500;
+
+        if ( $has_timeout ) {
+            sleep(60);
+            $this->setRequestsCountZero();
+        }
     }
 
     private function getQuotes(Object $origin, Object $destination, String $url_date) 
@@ -47,7 +60,7 @@ class FlightsController extends Controller
 
         $quotes = $this->sortQuotesInAscByMinPrice( $quotes );
 
-        return reset($quotes)->MinPrice;
+        return reset($quotes);
     }
     
     /* 
