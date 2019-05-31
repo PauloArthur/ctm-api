@@ -34,7 +34,7 @@ class CityController extends Controller
         $data = json_decode( $request->getContent() );
 
         $search_cheapest = new SearchCheapestController( $data->inputCities, $data->outboundDate, $data->inboundDate );
-
+        
         /* 
             The cheapest value using input cities as destination
         */
@@ -52,7 +52,7 @@ class CityController extends Controller
             ->orderBy('housing_cost', 'ASC')
             ->get()
             ->toArray();
-
+            
         $cheapest_meeting = $search_cheapest->getCheapestMeetingCity($remainign_cities, $cheapest_meeting);
 
         return compact("cheapest_meeting");
