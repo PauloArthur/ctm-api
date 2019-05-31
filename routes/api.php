@@ -22,4 +22,4 @@ Route::get('cities', 'CityController@index');
 Route::get('cities/{city}', 'CityController@show');
 Route::get('cities/autocomplete/{search}', ['middleware' => 'cors', 'uses' => 'CityController@autocomplete']);
 
-Route::post('cities/cheapest', ['middleware' => 'cors', 'uses' => 'CityController@cheapest']);
+Route::post('cities/cheapest', ['middleware' => 'cors', 'uses' => 'CityController@cheapest_meeting']);
