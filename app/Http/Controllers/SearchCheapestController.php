@@ -82,7 +82,7 @@ class SearchCheapestController extends FlightsController
 
         foreach ( $destinations as $destination ) {
             $destination_city = City::find($destination['id']);
-
+            
             $has_employees = isset($destination["employees"]);
             $employees = $has_employees ? $destination['employees'] : 0;
             
@@ -99,39 +99,44 @@ class SearchCheapestController extends FlightsController
             /* 
                 Jumps iteration when living cost is already bigger than cheapest city total cost
             */
-            if ( $old_cheapest && $living_cost > $old_cheapest['sum_total_cost'] ) continue;
+            if ( $old_cheapest && $living_cost > $old_cheapest['sum_total_cost'] ){
+                continue;
+            }
 
             $travel_total_cost = 0;
+            $travel_costs = [];
             $has_no_quote = false;
 
             foreach ( $origins as $origin ) {
                 /* 
                     Jumps iteration when origin is the same as destination
                 */
-                if ( $destination['id'] === $origin['id'] ) continue;
+                if ( $destination['id'] === $origin['id'] ){
+                    continue;
+                }
 
                 $origin_city = City::find($origin['id']);
 
-                $travel_price = parent::getCheapestQuote($origin_city, $destination_city, $this->url_date);
-                $has_no_quote = !$travel_price;
+                $quote = parent::getCheapestQuote($origin_city, $destination_city, $this->url_date);
+                
+                $travel_costs[] = compact("quote", "origin_city", "destination_city");
+                $has_no_quote = !$quote;
+                $travel_price = $has_no_quote ? 0 : $quote->MinPrice;
                 
                 /* 
-                    Jumps iteration if no quote is found from this origin
+                    Jumps outside iteration if no quote is found from this origin
                 */
-                if ( $has_no_quote ) continue;
+                if ( $has_no_quote ){
+                    continue 2;
+                }
                 
                 $travel_total_cost = $travel_total_cost + ($travel_price * $origin['employees']);
             }   
 
-            /* 
-                Jumps iteration if some origin had no quote for destination
-            */
-            if ( $has_no_quote ) continue;
-
             $sum_total_cost = $living_cost + $travel_total_cost;
             
             if ( $sum_total_cost < $old_cheapest['sum_total_cost'] ) {
-                $separate_info = compact("meals_total_cost", "housing_total_cost", "travel_total_cost", "travel_duration");
+                $separate_info = compact("meals_total_cost", "housing_total_cost", "travel_total_cost", "travel_duration", "travel_costs");
                 $old_cheapest = compact("sum_total_cost", "destination_city", "separate_info");
             }
         }
