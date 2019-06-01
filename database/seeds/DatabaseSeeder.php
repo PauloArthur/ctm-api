@@ -39,7 +39,7 @@ class CityTableSeeder extends Seeder
 
         $living_cost = new LivingCost();
 
-        $housing_cost = new HousingCost();
+        // $housing_cost = new HousingCost();
 
         $meals = [
             "Meal, Inexpensive Restaurant" => 1,
