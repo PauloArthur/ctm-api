@@ -53,7 +53,7 @@ class CityController extends Controller
             ->get()
             ->toArray();
             
-        // $cheapest_meeting = $search_cheapest->getCheapestMeetingCity($remainign_cities, $cheapest_meeting);
+        $cheapest_meeting = $search_cheapest->getCheapestMeetingCity($remainign_cities, $cheapest_meeting);
 
         return compact("cheapest_meeting");
     }
