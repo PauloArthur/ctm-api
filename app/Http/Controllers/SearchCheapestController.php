@@ -136,7 +136,13 @@ class SearchCheapestController extends FlightsController
             $sum_total_cost = $living_cost + $travel_total_cost;
             
             if ( $sum_total_cost < $old_cheapest['sum_total_cost'] ) {
-                $separate_info = compact("meals_total_cost", "housing_total_cost", "travel_total_cost", "travel_duration", "travel_costs");
+                $separate_info = [
+                    "meals_total_cost" => $meals_total_cost, 
+                    "housing_total_cost" => $housing_total_cost, 
+                    "travel_total_cost" => $travel_total_cost, 
+                    "travel_duration" => $this->travel_duration, 
+                    "travel_costs" => $travel_costs
+                ];
                 $old_cheapest = compact("sum_total_cost", "destination_city", "separate_info");
             }
         }
